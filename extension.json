@@ -1,0 +1,12 @@
+{
+  "id": "builtin.language-basics-yaml",
+  "name": "Language Basics Yaml",
+  "description": "Provides syntax highlighting and bracket matching in Yaml files.",
+  "languages": [
+    {
+      "id": "yaml",
+      "extensions": [".yml"],
+      "tokenize": "src/tokenizeYaml.js"
+    }
+  ]
+}
