@@ -1,6 +1,5 @@
 # Language Basics Yaml
 
-
 ## Contributing
 
 ```sh
