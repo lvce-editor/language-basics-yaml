@@ -5,7 +5,7 @@
   "languages": [
     {
       "id": "yaml",
-      "extensions": [".yml"],
+      "extensions": [".yml", ".eyaml", ".eyml", ".yaml", ".cff"],
       "tokenize": "src/tokenizeYaml.js"
     }
   ]
