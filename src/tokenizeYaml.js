@@ -164,6 +164,9 @@ export const tokenizeLine = (line, lineState) => {
         if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterDash
+        } else if ((next = part.match(RE_PROPERTY_NAME))) {
+          token = TokenType.PropertyName
+          state = State.AfterPropertyName
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
           token = TokenType.LanguageConstant
           state = State.TopLevelContent
