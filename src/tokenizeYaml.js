@@ -6,6 +6,7 @@ export const State = {
   InsideLineComment: 2,
   AfterPropertyName: 3,
   AfterPropertyNameAfterColon: 4,
+  AfterDash: 5,
 }
 
 export const StateMap = {
@@ -75,6 +76,7 @@ const RE_QUERY_CONTENT = /^[^\)]+/
 const RE_COMBINATOR = /^[\+\>\~]/
 const RE_LANGUAGE_CONSTANT = /^(?:true|false)/
 const RE_COLON = /^:/
+const RE_DASH = /^\-/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -111,6 +113,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.AfterDash
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -155,6 +160,23 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.AfterDash:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterDash
+        } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
+          token = TokenType.LanguageConstant
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_NUMERIC))) {
+          token = TokenType.Numeric
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.PropertyValueString
+          state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
       default:
         console.log({ state, line })
         throw new Error('no')
@@ -173,5 +195,3 @@ export const tokenizeLine = (line, lineState) => {
     tokens,
   }
 }
-
-tokenizeLine(`x: 11`, initialLineState) //?
