@@ -1,4 +1,4 @@
 JsonPropertyName
-
+Punctuation
 Whitespace
 Numeric
