@@ -45,7 +45,7 @@ export const TokenMap = {
   [TokenType.Unknown]: 'Unknown',
   [TokenType.Whitespace]: 'Whitespace',
   [TokenType.Punctuation]: 'Punctuation',
-  [TokenType.PropertyValueString]: 'PropertyValueString',
+  [TokenType.PropertyValueString]: 'String',
 }
 
 const RE_LINE_COMMENT_START = /^#/
