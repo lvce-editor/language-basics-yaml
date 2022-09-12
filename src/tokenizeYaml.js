@@ -17,31 +17,33 @@ export const StateMap = {
  * @enum number
  */
 export const TokenType = {
-  CssSelector: 1,
-  Whitespace: 2,
-  None: 57,
-  Unknown: 881,
-  NewLine: 884,
   Comment: 885,
+  CssSelector: 1,
+  LanguageConstant: 11,
+  NewLine: 884,
+  None: 57,
+  Numeric: 15,
+  PropertyName: 12,
+  PropertyValueString: 14,
+  Punctuation: 13,
   Query: 886,
   Text: 887,
-  LanguageConstant: 11,
-  PropertyName: 12,
-  Punctuation: 13,
-  PropertyValueString: 14,
+  Unknown: 881,
+  Whitespace: 2,
 }
 
 export const TokenMap = {
-  [TokenType.CssSelector]: 'CssSelector',
-  [TokenType.Whitespace]: 'Whitespace',
-  [TokenType.None]: 'None',
-  [TokenType.Unknown]: 'Unknown',
-  [TokenType.NewLine]: 'NewLine',
   [TokenType.Comment]: 'Comment',
+  [TokenType.CssSelector]: 'CssSelector',
+  [TokenType.LanguageConstant]: 'LanguageConstant',
+  [TokenType.NewLine]: 'NewLine',
+  [TokenType.None]: 'None',
+  [TokenType.Numeric]: 'Numeric',
+  [TokenType.PropertyName]: 'JsonPropertyName',
   [TokenType.Query]: 'Query',
   [TokenType.Text]: 'Text',
-  [TokenType.LanguageConstant]: 'LanguageConstant',
-  [TokenType.PropertyName]: 'JsonPropertyName',
+  [TokenType.Unknown]: 'Unknown',
+  [TokenType.Whitespace]: 'Whitespace',
 }
 
 const RE_LINE_COMMENT_START = /^#/
@@ -104,6 +106,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
           token = TokenType.PropertyName
           state = State.AfterPropertyName
+        } else if ((next = part.match(RE_NUMERIC))) {
+          token = TokenType.Numeric
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -161,4 +166,4 @@ export const tokenizeLine = (line, lineState) => {
   }
 }
 
-tokenizeLine(`x: abc`, initialLineState)
+tokenizeLine(`11`, initialLineState) //?
