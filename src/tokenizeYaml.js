@@ -4,6 +4,8 @@
 export const State = {
   TopLevelContent: 1,
   InsideLineComment: 2,
+  AfterPropertyName: 3,
+  AfterPropertyNameAfterColon: 4,
 }
 
 export const StateMap = {
@@ -24,6 +26,9 @@ export const TokenType = {
   Query: 886,
   Text: 887,
   LanguageConstant: 11,
+  PropertyName: 12,
+  Punctuation: 13,
+  PropertyValueString: 14,
 }
 
 export const TokenMap = {
@@ -36,14 +41,14 @@ export const TokenMap = {
   [TokenType.Query]: 'Query',
   [TokenType.Text]: 'Text',
   [TokenType.LanguageConstant]: 'LanguageConstant',
+  [TokenType.PropertyName]: 'JsonPropertyName',
 }
 
 const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
-const RE_PROPERTY_NAME = /^[a-zA-Z\-]+\b/
-const RE_COLON = /^:/
+const RE_PROPERTY_NAME = /^[a-zA-Z\-]+(?=\s*:)/
 const RE_PROPERTY_VALUE = /^[^;\}]+/
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
@@ -65,6 +70,7 @@ const RE_QUERY_NAME = /^[a-z\-]+/
 const RE_QUERY_CONTENT = /^[^\)]+/
 const RE_COMBINATOR = /^[\+\>\~]/
 const RE_LANGUAGE_CONSTANT = /^(?:true|false)/
+const RE_COLON = /^:/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -95,6 +101,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
           token = TokenType.LanguageConstant
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_PROPERTY_NAME))) {
+          token = TokenType.PropertyName
+          state = State.AfterPropertyName
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -106,6 +115,31 @@ export const tokenizeLine = (line, lineState) => {
       case State.InsideLineComment:
         if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Comment
+          state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterPropertyName:
+        if ((next = part.match(RE_COLON))) {
+          token = TokenType.Punctuation
+          state = State.AfterPropertyNameAfterColon
+        } else if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterPropertyName
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterPropertyNameAfterColon:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterPropertyNameAfterColon
+        } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
+          token = TokenType.LanguageConstant
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.PropertyValueString
           state = State.TopLevelContent
         } else {
           throw new Error('no')
@@ -126,3 +160,5 @@ export const tokenizeLine = (line, lineState) => {
     tokens,
   }
 }
+
+tokenizeLine(`x: abc`, initialLineState)
