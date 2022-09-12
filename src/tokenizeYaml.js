@@ -165,6 +165,9 @@ export const tokenizeLine = (line, lineState) => {
       length: next[0].length,
     })
   }
+  if (state === State.AfterPropertyNameAfterColon) {
+    state = State.TopLevelContent
+  }
   return {
     state,
     tokens,
