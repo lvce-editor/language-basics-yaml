@@ -143,6 +143,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
           token = TokenType.LanguageConstant
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_NUMERIC))) {
+          token = TokenType.Numeric
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.PropertyValueString
           state = State.TopLevelContent
@@ -166,4 +169,4 @@ export const tokenizeLine = (line, lineState) => {
   }
 }
 
-tokenizeLine(`11`, initialLineState) //?
+tokenizeLine(`x: 11`, initialLineState) //?
