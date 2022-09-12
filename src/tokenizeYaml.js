@@ -23,6 +23,7 @@ export const TokenType = {
   Comment: 885,
   Query: 886,
   Text: 887,
+  LanguageConstant: 11,
 }
 
 export const TokenMap = {
@@ -34,6 +35,7 @@ export const TokenMap = {
   [TokenType.Comment]: 'Comment',
   [TokenType.Query]: 'Query',
   [TokenType.Text]: 'Text',
+  [TokenType.LanguageConstant]: 'LanguageConstant',
 }
 
 const RE_LINE_COMMENT_START = /^#/
@@ -62,6 +64,7 @@ const RE_STAR = /^\*/
 const RE_QUERY_NAME = /^[a-z\-]+/
 const RE_QUERY_CONTENT = /^[^\)]+/
 const RE_COMBINATOR = /^[\+\>\~]/
+const RE_LANGUAGE_CONSTANT = /^(?:true|false)/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -88,6 +91,9 @@ export const tokenizeLine = (line, lineState) => {
           state = State.InsideLineComment
         } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
+          token = TokenType.LanguageConstant
           state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
