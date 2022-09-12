@@ -84,6 +84,8 @@ export const initialLineState = {
   stack: [],
 }
 
+export const hasArrayReturn = true
+
 /**
  * @param {string} line
  * @param {any} lineState
@@ -184,11 +186,9 @@ export const tokenizeLine = (line, lineState) => {
         console.log({ state, line })
         throw new Error('no')
     }
-    index += next[0].length
-    tokens.push({
-      type: token,
-      length: next[0].length,
-    })
+    const length = next[0].length
+    index += length
+    tokens.push(token, length)
   }
   if (state === State.AfterPropertyNameAfterColon) {
     state = State.TopLevelContent
