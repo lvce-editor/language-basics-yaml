@@ -8,5 +8,4 @@
 
     git config user.email "vscode@microsoft.com"
     git config user.name "VSCode"
-  x2
   displayName: Prepare tooling
