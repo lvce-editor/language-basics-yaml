@@ -23,8 +23,6 @@
     "singleQuote": true
   },
   "test-tokenize": {
-    "skip": [
-      "multiline-string-with-colon"
-    ]
+    "skip": []
   }
 }

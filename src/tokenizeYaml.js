@@ -10,6 +10,7 @@ export const State = {
   AfterPropertyNameAfterColonAfterNewLine: 6,
   AfterPipe: 7,
   InsideMultiLineString: 8,
+  InsideMultiLineStringAfterWhitespace: 9,
 }
 
 export const StateMap = {
@@ -255,15 +256,25 @@ export const tokenizeLine = (line, lineState) => {
         if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           if (next[0].length > keyOffset) {
-            state = State.InsideMultiLineString
+            state = State.InsideMultiLineStringAfterWhitespace
           } else {
             state = State.TopLevelContent
           }
+        } else if ((next = part.match(RE_PROPERTY_NAME))) {
+          token = TokenType.PropertyName
+          state = State.AfterPropertyName
         } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.Text
+          state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.InsideMultiLineStringAfterWhitespace:
+        if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.String
           state = State.InsideMultiLineString
         } else {
-          part
           throw new Error('no')
         }
         break
