@@ -198,5 +198,3 @@ export const tokenizeLine = (line, lineState) => {
     tokens,
   }
 }
-
-tokenizeLine(`a test: "hello world!`, initialLineState) //?
