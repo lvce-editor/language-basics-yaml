@@ -58,6 +58,7 @@ const RE_PROPERTY_VALUE = /^[^;\}]+/
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
 const RE_ANYTHING = /^.*/
+const RE_ANYTHING_BUT_COMMENT = /^[^#]+/
 const RE_NUMERIC = /^(([0-9]+\.?[0-9]*)|(\.[0-9]+))/
 const RE_ANYTHING_UNTIL_CLOSE_BRACE = /^[^\}]+/
 const RE_BLOCK_COMMENT_START = /^\/\*/
@@ -77,6 +78,7 @@ const RE_COMBINATOR = /^[\+\>\~]/
 const RE_LANGUAGE_CONSTANT = /^(?:true|false)/
 const RE_COLON = /^:/
 const RE_DASH = /^\-/
+const RE_WORDS = /^[\w\s]*\w/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -118,6 +120,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_WORDS))) {
+          token = TokenType.Text
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -155,6 +160,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
+          token = TokenType.Comment
+          state = State.InsideLineComment
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.PropertyValueString
           state = State.TopLevelContent
