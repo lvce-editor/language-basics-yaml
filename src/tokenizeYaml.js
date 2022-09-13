@@ -7,6 +7,7 @@ export const State = {
   AfterPropertyName: 3,
   AfterPropertyNameAfterColon: 4,
   AfterDash: 5,
+  AfterPropertyNameAfterColonAfterNewLine: 6,
 }
 
 export const StateMap = {
@@ -190,6 +191,33 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.AfterPropertyNameAfterColonAfterNewLine:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterPropertyNameAfterColonAfterNewLine
+        } else if ((next = part.match(RE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.AfterDash
+        } else if ((next = part.match(RE_PROPERTY_NAME))) {
+          token = TokenType.PropertyName
+          state = State.AfterPropertyName
+        } else if ((next = part.match(RE_NUMERIC))) {
+          token = TokenType.Numeric
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
+          token = TokenType.LanguageConstant
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_WORDS))) {
+          token = TokenType.PropertyValueString
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
+          token = TokenType.Comment
+          state = State.InsideLineComment
+        } else {
+          part
+          throw new Error('no')
+        }
+        break
       default:
         console.log({ state, line })
         throw new Error('no')
@@ -199,7 +227,7 @@ export const tokenizeLine = (line, lineState) => {
     tokens.push(token, tokenLength)
   }
   if (state === State.AfterPropertyNameAfterColon) {
-    state = State.TopLevelContent
+    state = State.AfterPropertyNameAfterColonAfterNewLine
   }
   return {
     state,
