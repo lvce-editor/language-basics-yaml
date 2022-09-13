@@ -194,9 +194,9 @@ export const tokenizeLine = (line, lineState) => {
         console.log({ state, line })
         throw new Error('no')
     }
-    const length = next[0].length
-    index += length
-    tokens.push(token, length)
+    const tokenLength = next[0].length
+    index += tokenLength
+    tokens.push(token, tokenLength)
   }
   if (state === State.AfterPropertyNameAfterColon) {
     state = State.TopLevelContent
