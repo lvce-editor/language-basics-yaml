@@ -53,7 +53,7 @@ const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
-const RE_PROPERTY_NAME = /^[a-zA-Z\-\_]+(?=\s*:)/
+const RE_PROPERTY_NAME = /^[a-zA-Z\-\_\d]+(?=\s*:)/
 const RE_PROPERTY_VALUE = /^[^;\}]+/
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
@@ -198,3 +198,5 @@ export const tokenizeLine = (line, lineState) => {
     tokens,
   }
 }
+
+tokenizeLine(`test-4 : abc-def`, initialLineState) //?
