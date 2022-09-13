@@ -1,0 +1,7 @@
+test: |
+    note that this is blue and it should't:
+    when there's no colon, it works correctly
+    same problem here: but after the colon it's OK
+
+test: |
+    this works correctly

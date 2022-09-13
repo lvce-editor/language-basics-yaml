@@ -1,0 +1,11 @@
+some_bash_script:
+  content: |
+            echo 'Some multi-line echo...
+
+            ...ending with two line breaks.
+
+            ' > some_file.txt
+  some:
+  further:
+  yaml:
+  parts:
