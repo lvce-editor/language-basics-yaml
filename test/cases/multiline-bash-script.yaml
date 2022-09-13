@@ -1,0 +1,12 @@
+- script: |
+    set -e
+    cat << EOF > ~/.netrc
+    machine github.com
+    login vscode
+    password $(github-distro-mixin-password)
+    EOF
+
+    git config user.email "vscode@microsoft.com"
+    git config user.name "VSCode"
+  x2
+  displayName: Prepare tooling
