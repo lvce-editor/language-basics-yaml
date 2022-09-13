@@ -24,8 +24,6 @@
   },
   "test-tokenize": {
     "skip": [
-      "multiline-bash-script",
-      "multiline-string-and-single-quote",
       "multiline-string-with-colon"
     ]
   }

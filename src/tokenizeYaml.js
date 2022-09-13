@@ -8,6 +8,8 @@ export const State = {
   AfterPropertyNameAfterColon: 4,
   AfterDash: 5,
   AfterPropertyNameAfterColonAfterNewLine: 6,
+  AfterPipe: 7,
+  InsideMultiLineString: 8,
 }
 
 export const StateMap = {
@@ -32,6 +34,7 @@ export const TokenType = {
   Text: 887,
   Unknown: 881,
   Whitespace: 2,
+  String: 188,
 }
 
 export const TokenMap = {
@@ -48,6 +51,7 @@ export const TokenMap = {
   [TokenType.Whitespace]: 'Whitespace',
   [TokenType.Punctuation]: 'Punctuation',
   [TokenType.PropertyValueString]: 'String',
+  [TokenType.String]: 'String',
 }
 
 const RE_LINE_COMMENT_START = /^#/
@@ -80,14 +84,30 @@ const RE_LANGUAGE_CONSTANT = /^(?:true|false)/
 const RE_COLON = /^:/
 const RE_DASH = /^\-/
 const RE_WORDS = /^[\w\s]*\w/
+const RE_PIPE = /^\|/
+const RE_KEY_PRE = /^\s*(\-\s*)?/
 
 export const initialLineState = {
   state: State.TopLevelContent,
   tokens: [],
-  stack: [],
+  indent: '',
+  keyOffset: 0,
 }
 
 export const hasArrayReturn = true
+
+/**
+ *
+ * @param {string} line
+ * @returns {number}
+ */
+const getKeyOffset = (line) => {
+  const whiteSpaceMatch = line.match(RE_KEY_PRE)
+  if (whiteSpaceMatch) {
+    return whiteSpaceMatch[0].length
+  }
+  return 0
+}
 
 /**
  * @param {string} line
@@ -99,6 +119,7 @@ export const tokenizeLine = (line, lineState) => {
   let tokens = []
   let token = TokenType.None
   let state = lineState.state
+  let keyOffset = lineState.keyOffset
   while (index < line.length) {
     const part = line.slice(index)
     switch (state) {
@@ -164,9 +185,21 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
+        } else if ((next = part.match(RE_PIPE))) {
+          part
+          token = TokenType.Punctuation
+          state = State.AfterPipe
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.PropertyValueString
           state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterPipe:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterPipe
         } else {
           throw new Error('no')
         }
@@ -218,6 +251,22 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.InsideMultiLineString:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          if (next[0].length > keyOffset) {
+            state = State.InsideMultiLineString
+          } else {
+            state = State.TopLevelContent
+          }
+        } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.String
+          state = State.InsideMultiLineString
+        } else {
+          part
+          throw new Error('no')
+        }
+        break
       default:
         console.log({ state, line })
         throw new Error('no')
@@ -226,11 +275,20 @@ export const tokenizeLine = (line, lineState) => {
     index += tokenLength
     tokens.push(token, tokenLength)
   }
-  if (state === State.AfterPropertyNameAfterColon) {
-    state = State.AfterPropertyNameAfterColonAfterNewLine
+  switch (state) {
+    case State.AfterPropertyNameAfterColon:
+      state = State.AfterPropertyNameAfterColonAfterNewLine
+      break
+    case State.AfterPipe:
+      keyOffset = getKeyOffset(line)
+      state = State.InsideMultiLineString
+      break
+    default:
+      break
   }
   return {
     state,
     tokens,
+    keyOffset,
   }
 }
