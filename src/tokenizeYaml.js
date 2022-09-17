@@ -11,6 +11,7 @@ export const State = {
   AfterPipe: 7,
   InsideMultiLineString: 8,
   InsideMultiLineStringAfterWhitespace: 9,
+  AfterPropertyValue: 10,
 }
 
 export const StateMap = {
@@ -192,7 +193,21 @@ export const tokenizeLine = (line, lineState) => {
           state = State.AfterPipe
         } else if ((next = part.match(RE_PROPERTY_VALUE_1))) {
           token = TokenType.PropertyValueString
-          state = State.AfterPropertyNameAfterColon
+          state = State.AfterPropertyValue
+        } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.PropertyValueString
+          state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterPropertyValue:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterPropertyValue
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
+          token = TokenType.Comment
+          state = State.InsideLineComment
         } else {
           throw new Error('no')
         }
@@ -303,7 +318,3 @@ export const tokenizeLine = (line, lineState) => {
     keyOffset,
   }
 }
-
-tokenizeLine(`on_success: change # options`, initialLineState) //?
-
-'change #'.match(RE_PROPERTY_VALUE_1) //?
