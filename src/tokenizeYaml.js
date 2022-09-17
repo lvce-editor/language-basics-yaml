@@ -60,7 +60,7 @@ const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
 const RE_PROPERTY_NAME = /^[a-zA-Z\-\_\d\s]+\b(?=\s*:(\s+|$))/
-const RE_PROPERTY_VALUE = /^[^;\}]+/
+const RE_PROPERTY_VALUE_1 = /^.+(?=\s+#)/s
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
 const RE_ANYTHING = /^.*/
@@ -190,9 +190,9 @@ export const tokenizeLine = (line, lineState) => {
           part
           token = TokenType.Punctuation
           state = State.AfterPipe
-        } else if ((next = part.match(RE_ANYTHING))) {
+        } else if ((next = part.match(RE_PROPERTY_VALUE_1))) {
           token = TokenType.PropertyValueString
-          state = State.TopLevelContent
+          state = State.AfterPropertyNameAfterColon
         } else {
           throw new Error('no')
         }
@@ -303,3 +303,7 @@ export const tokenizeLine = (line, lineState) => {
     keyOffset,
   }
 }
+
+tokenizeLine(`on_success: change # options`, initialLineState) //?
+
+'change #'.match(RE_PROPERTY_VALUE_1) //?
