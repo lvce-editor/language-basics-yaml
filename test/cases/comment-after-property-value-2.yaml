@@ -1,0 +1,4 @@
+# comments in seperate line works
+quotedText: "this is quoted" #this comment has syntax highlighting
+text: Pretty vector drawing. #this is comment doesn't have proper syntax higlighting
+number: 3 #this comment also doesn't have proper syntax highlighting

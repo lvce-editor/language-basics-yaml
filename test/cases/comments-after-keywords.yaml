@@ -1,0 +1,5 @@
+keyword-control: null
+string-control: string
+
+example1: null #Highlights as string but evaluates null
+example2: null#Highlights as keyword but evaluates as string
