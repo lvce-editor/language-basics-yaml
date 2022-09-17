@@ -20,7 +20,5 @@ NewLine
 JsonPropertyName
 Punctuation
 Whitespace
-LanguageConstant
-Comment
-Comment
+String
 NewLine
