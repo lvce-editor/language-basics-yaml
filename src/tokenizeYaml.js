@@ -86,7 +86,7 @@ const RE_LANGUAGE_CONSTANT = /^(?:true|false|null)(?!#)/
 const RE_COLON = /^:/
 const RE_DASH = /^\-/
 const RE_WORDS = /^[\w\s]*\w/
-const RE_PIPE = /^\|/
+const RE_MULTI_LINE_STRING_START = /^(?:\||>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
 
 export const initialLineState = {
@@ -187,7 +187,7 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
-        } else if ((next = part.match(RE_PIPE))) {
+        } else if ((next = part.match(RE_MULTI_LINE_STRING_START))) {
           part
           token = TokenType.Punctuation
           state = State.AfterPipe
