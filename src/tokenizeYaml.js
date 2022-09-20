@@ -86,7 +86,7 @@ const RE_LANGUAGE_CONSTANT = /^(?:true|false|null)(?!#)/
 const RE_COLON = /^:/
 const RE_DASH = /^\-/
 const RE_WORDS = /^[\w\s]*\w/
-const RE_MULTI_LINE_STRING_START = /^(?:\||>)/
+const RE_MULTI_LINE_STRING_START = /^(?:\||>\-|>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
 
 export const initialLineState = {
@@ -188,7 +188,6 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Comment
           state = State.InsideLineComment
         } else if ((next = part.match(RE_MULTI_LINE_STRING_START))) {
-          part
           token = TokenType.Punctuation
           state = State.AfterPipe
         } else if ((next = part.match(RE_PROPERTY_VALUE_1))) {
@@ -234,6 +233,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_MULTI_LINE_STRING_START))) {
+          token = TokenType.Punctuation
+          state = State.AfterPipe
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.PropertyValueString
           state = State.TopLevelContent
@@ -279,6 +281,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
           token = TokenType.PropertyName
           state = State.AfterPropertyName
+        } else if ((next = part.match(RE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.AfterDash
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -308,6 +313,8 @@ export const tokenizeLine = (line, lineState) => {
       break
     case State.AfterPipe:
       keyOffset = getKeyOffset(line)
+      keyOffset
+      line
       state = State.InsideMultiLineString
       break
     default:
