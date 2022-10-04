@@ -350,5 +350,3 @@ export const tokenizeLine = (line, lineState) => {
     keyOffset,
   }
 }
-
-tokenizeLine(`.: abc`, initialLineState) //?
