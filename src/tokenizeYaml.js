@@ -61,7 +61,8 @@ const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
-const RE_PROPERTY_NAME = /^[a-zA-Z\-\_\d\s]+\b(?=\s*:(\s+|$))/
+const RE_PROPERTY_NAME = /^[a-zA-Z\-\_\d\.]+(?=\s*:(\s+|$))/
+const RE_PROPERTY_NAME_2 = /^[a-zA-Z\-\_\d\.\s]*[a-zA-Z\-\_\d\.](?=\s*:(\s+|$))/
 const RE_PROPERTY_VALUE_1 = /^.+(?=\s+#)/s
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
@@ -142,6 +143,9 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.AfterDash
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
+          token = TokenType.PropertyName
+          state = State.AfterPropertyName
+        } else if ((next = part.match(RE_PROPERTY_NAME_2))) {
           token = TokenType.PropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_NUMERIC))) {
@@ -346,3 +350,5 @@ export const tokenizeLine = (line, lineState) => {
     keyOffset,
   }
 }
+
+tokenizeLine(`.: abc`, initialLineState) //?
