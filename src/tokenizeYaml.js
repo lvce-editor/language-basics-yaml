@@ -150,6 +150,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_WORDS))) {
           token = TokenType.Text
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameString
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
