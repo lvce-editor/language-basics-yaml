@@ -12,6 +12,7 @@ export const State = {
   InsideMultiLineString: 8,
   InsideMultiLineStringAfterWhitespace: 9,
   AfterPropertyValue: 10,
+  InsidePropertyNameString: 11,
 }
 
 export const StateMap = {
@@ -88,6 +89,8 @@ const RE_DASH = /^\-/
 const RE_WORDS = /^[\w\s]*\w/
 const RE_MULTI_LINE_STRING_START = /^(?:\||>\-|>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
+const RE_SINGLE_QUOTE = /^'/
+const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -265,8 +268,22 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameString
         } else {
           part
+          throw new Error('no')
+        }
+        break
+      case State.InsidePropertyNameString:
+        if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.AfterPropertyName
+        } else if ((next = part.match(RE_STRING_SINGLE_QUOTE_CONTENT))) {
+          token = TokenType.String
+          state = State.InsidePropertyNameString
+        } else {
           throw new Error('no')
         }
         break

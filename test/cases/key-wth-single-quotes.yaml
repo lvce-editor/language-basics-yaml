@@ -1,0 +1,2 @@
+overrides:
+  '@vitejs/plugin-vue': workspace:*
