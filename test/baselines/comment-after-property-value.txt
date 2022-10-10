@@ -1,7 +1,7 @@
-JsonPropertyName
+YamlPropertyName
 Punctuation
 Whitespace
-String
+YamlPropertyValueString
 Whitespace
 Comment
 Comment

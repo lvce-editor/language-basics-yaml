@@ -1,10 +1,10 @@
-JsonPropertyName
+YamlPropertyName
 Punctuation
 NewLine
 Whitespace
 Punctuation
 Whitespace
-JsonPropertyName
+YamlPropertyName
 Punctuation
 Whitespace
-String
+YamlPropertyValueString
