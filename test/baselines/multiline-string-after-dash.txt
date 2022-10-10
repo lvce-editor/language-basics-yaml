@@ -3,4 +3,4 @@ Whitespace
 Punctuation
 NewLine
 Whitespace
-String
+YamlPropertyValueString
