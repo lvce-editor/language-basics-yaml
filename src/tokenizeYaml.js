@@ -30,14 +30,14 @@ export const TokenType = {
   NewLine: 884,
   None: 57,
   Numeric: 15,
-  PropertyName: 12,
-  PropertyValueString: 14,
   Punctuation: 13,
   Query: 886,
   Text: 887,
   Unknown: 881,
   Whitespace: 2,
   String: 188,
+  YamlPropertyName: 123,
+  YamlPropertyValueString: 124,
 }
 
 export const TokenMap = {
@@ -47,14 +47,14 @@ export const TokenMap = {
   [TokenType.NewLine]: 'NewLine',
   [TokenType.None]: 'None',
   [TokenType.Numeric]: 'Numeric',
-  [TokenType.PropertyName]: 'JsonPropertyName',
   [TokenType.Query]: 'Query',
   [TokenType.Text]: 'Text',
   [TokenType.Unknown]: 'Unknown',
   [TokenType.Whitespace]: 'Whitespace',
   [TokenType.Punctuation]: 'Punctuation',
-  [TokenType.PropertyValueString]: 'String',
   [TokenType.String]: 'String',
+  [TokenType.YamlPropertyName]: 'YamlPropertyName',
+  [TokenType.YamlPropertyValueString]: 'YamlPropertyValueString',
 }
 
 const RE_LINE_COMMENT_START = /^#/
@@ -144,10 +144,10 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.AfterDash
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
-          token = TokenType.PropertyName
+          token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_PROPERTY_NAME_2))) {
-          token = TokenType.PropertyName
+          token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
@@ -202,10 +202,10 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.AfterPipe
         } else if ((next = part.match(RE_PROPERTY_VALUE_1))) {
-          token = TokenType.PropertyValueString
+          token = TokenType.YamlPropertyValueString
           state = State.AfterPropertyValue
         } else if ((next = part.match(RE_ANYTHING))) {
-          token = TokenType.PropertyValueString
+          token = TokenType.YamlPropertyValueString
           state = State.TopLevelContent
         } else {
           throw new Error('no')
@@ -236,7 +236,7 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Whitespace
           state = State.AfterDash
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
-          token = TokenType.PropertyName
+          token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
           token = TokenType.LanguageConstant
@@ -248,7 +248,7 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.AfterPipe
         } else if ((next = part.match(RE_ANYTHING))) {
-          token = TokenType.PropertyValueString
+          token = TokenType.YamlPropertyValueString
           state = State.TopLevelContent
         } else {
           throw new Error('no')
@@ -262,7 +262,7 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.AfterDash
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
-          token = TokenType.PropertyName
+          token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_NUMERIC))) {
           token = TokenType.Numeric
@@ -271,7 +271,7 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.LanguageConstant
           state = State.TopLevelContent
         } else if ((next = part.match(RE_WORDS))) {
-          token = TokenType.PropertyValueString
+          token = TokenType.YamlPropertyValueString
           state = State.TopLevelContent
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
@@ -304,7 +304,7 @@ export const tokenizeLine = (line, lineState) => {
             state = State.TopLevelContent
           }
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
-          token = TokenType.PropertyName
+          token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_DASH))) {
           token = TokenType.Punctuation
@@ -318,7 +318,7 @@ export const tokenizeLine = (line, lineState) => {
         break
       case State.InsideMultiLineStringAfterWhitespace:
         if ((next = part.match(RE_ANYTHING))) {
-          token = TokenType.String
+          token = TokenType.YamlPropertyValueString
           state = State.InsideMultiLineString
         } else {
           throw new Error('no')
