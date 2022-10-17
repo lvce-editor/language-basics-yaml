@@ -38,6 +38,8 @@ export const TokenType = {
   String: 188,
   YamlPropertyName: 123,
   YamlPropertyValueString: 124,
+  Alias: 125,
+  Anchor: 126,
 }
 
 export const TokenMap = {
@@ -55,6 +57,8 @@ export const TokenMap = {
   [TokenType.String]: 'String',
   [TokenType.YamlPropertyName]: 'YamlPropertyName',
   [TokenType.YamlPropertyValueString]: 'YamlPropertyValueString',
+  [TokenType.Alias]: 'VariableName',
+  [TokenType.Anchor]: 'VariableName',
 }
 
 const RE_LINE_COMMENT_START = /^#/
@@ -64,7 +68,7 @@ const RE_CURLY_CLOSE = /^\}/
 const RE_PROPERTY_NAME = /^[\:@\/\\a-zA-Z\-\_\d\.]+(?=\s*:(\s+|$))/
 const RE_PROPERTY_NAME_2 =
   /^[\:@\/\\a-zA-Z\-\_\d\.\s]*[@\/\\a-zA-Z\-\_\d\.](?=\s*:(\s+|$))/
-const RE_PROPERTY_VALUE_1 = /^.+(?=\s+#)/s
+const RE_PROPERTY_VALUE_1 = /^[^&].*(?=\s+#)/s
 const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
 const RE_ANYTHING = /^.+/s
@@ -93,6 +97,9 @@ const RE_MULTI_LINE_STRING_START = /^(?:\||>\-|>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
 const RE_SINGLE_QUOTE = /^'/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
+const RE_ALIAS = /^\*.+/
+const RE_ANCHOR = /^\&.+/
+const RE_MERGE_KEY = /^<<\:(?=\s)/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -158,6 +165,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_SINGLE_QUOTE))) {
           token = TokenType.Punctuation
           state = State.InsidePropertyNameString
+        } else if ((next = part.match(RE_MERGE_KEY))) {
+          token = TokenType.Punctuation
+          state = State.AfterPropertyNameAfterColon
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -204,6 +214,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_PROPERTY_VALUE_1))) {
           token = TokenType.YamlPropertyValueString
           state = State.AfterPropertyValue
+        } else if ((next = part.match(RE_ANCHOR))) {
+          token = TokenType.Anchor
+          state = State.AfterPropertyNameAfterColon
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.YamlPropertyValueString
           state = State.TopLevelContent
@@ -247,6 +260,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_MULTI_LINE_STRING_START))) {
           token = TokenType.Punctuation
           state = State.AfterPipe
+        } else if ((next = part.match(RE_ALIAS))) {
+          token = TokenType.Alias
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.YamlPropertyValueString
           state = State.TopLevelContent
