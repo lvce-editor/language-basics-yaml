@@ -309,6 +309,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_DASH))) {
           token = TokenType.Punctuation
           state = State.AfterDash
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
+          token = TokenType.Comment
+          state = State.InsideLineComment
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent

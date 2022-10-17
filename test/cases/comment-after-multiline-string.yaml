@@ -1,0 +1,4 @@
+lockComment: >
+  abc
+# Issues or pull requests with these labels will not be locked
+exemptLabels:
