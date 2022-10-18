@@ -1,0 +1,7 @@
+- key: value
+  anotherkey: another value
+
+- key: |
+    Comment
+  anotherkey: |
+    Another comment
