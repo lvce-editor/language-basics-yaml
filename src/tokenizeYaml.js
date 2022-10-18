@@ -99,6 +99,7 @@ const RE_KEY_PRE = /^\s*(\-\s*)?/
 const RE_SINGLE_QUOTE = /^'/
 const RE_DOUBLE_QUOTE = /^"/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
+const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"]+/
 const RE_ALIAS = /^\*.+/
 const RE_ANCHOR = /^\&.+/
 const RE_MERGE_KEY = /^<<\:(?=\s)/
@@ -320,12 +321,12 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.InsidePropertyNameStringDoubleQuoted:
-        if ((next = part.match(RE_SINGLE_QUOTE))) {
+        if ((next = part.match(RE_DOUBLE_QUOTE))) {
           token = TokenType.Punctuation
           state = State.AfterPropertyName
-        } else if ((next = part.match(RE_STRING_SINGLE_QUOTE_CONTENT))) {
+        } else if ((next = part.match(RE_STRING_DOUBLE_QUOTE_CONTENT))) {
           token = TokenType.String
-          state = State.InsidePropertyNameStringSingleQuoted
+          state = State.InsidePropertyNameStringDoubleQuoted
         } else {
           throw new Error('no')
         }
