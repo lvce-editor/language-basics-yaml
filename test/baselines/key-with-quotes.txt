@@ -4,3 +4,7 @@ NewLine
 Whitespace
 Punctuation
 String
+Punctuation
+Punctuation
+Whitespace
+YamlPropertyValueString
