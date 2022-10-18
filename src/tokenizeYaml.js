@@ -12,7 +12,8 @@ export const State = {
   InsideMultiLineString: 8,
   InsideMultiLineStringAfterWhitespace: 9,
   AfterPropertyValue: 10,
-  InsidePropertyNameString: 11,
+  InsidePropertyNameStringSingleQuoted: 11,
+  InsidePropertyNameStringDoubleQuoted: 12,
 }
 
 export const StateMap = {
@@ -96,6 +97,7 @@ const RE_WORDS = /^[\w\s]*\w/
 const RE_MULTI_LINE_STRING_START = /^(?:\||>\-|>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
 const RE_SINGLE_QUOTE = /^'/
+const RE_DOUBLE_QUOTE = /^"/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
 const RE_ALIAS = /^\*.+/
 const RE_ANCHOR = /^\&.+/
@@ -164,7 +166,7 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
         } else if ((next = part.match(RE_SINGLE_QUOTE))) {
           token = TokenType.Punctuation
-          state = State.InsidePropertyNameString
+          state = State.InsidePropertyNameStringSingleQuoted
         } else if ((next = part.match(RE_MERGE_KEY))) {
           token = TokenType.Punctuation
           state = State.AfterPropertyNameAfterColon
@@ -294,19 +296,33 @@ export const tokenizeLine = (line, lineState) => {
           state = State.InsideLineComment
         } else if ((next = part.match(RE_SINGLE_QUOTE))) {
           token = TokenType.Punctuation
-          state = State.InsidePropertyNameString
+          state = State.InsidePropertyNameStringSingleQuoted
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringDoubleQuoted
         } else {
           part
           throw new Error('no')
         }
         break
-      case State.InsidePropertyNameString:
+      case State.InsidePropertyNameStringSingleQuoted:
         if ((next = part.match(RE_SINGLE_QUOTE))) {
           token = TokenType.Punctuation
           state = State.AfterPropertyName
         } else if ((next = part.match(RE_STRING_SINGLE_QUOTE_CONTENT))) {
           token = TokenType.String
-          state = State.InsidePropertyNameString
+          state = State.InsidePropertyNameStringSingleQuoted
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.InsidePropertyNameStringDoubleQuoted:
+        if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.AfterPropertyName
+        } else if ((next = part.match(RE_STRING_SINGLE_QUOTE_CONTENT))) {
+          token = TokenType.String
+          state = State.InsidePropertyNameStringSingleQuoted
         } else {
           throw new Error('no')
         }
