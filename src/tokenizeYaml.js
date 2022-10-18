@@ -167,6 +167,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_SINGLE_QUOTE))) {
           token = TokenType.Punctuation
           state = State.InsidePropertyNameStringSingleQuoted
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringDoubleQuoted
         } else if ((next = part.match(RE_MERGE_KEY))) {
           token = TokenType.Punctuation
           state = State.AfterPropertyNameAfterColon
