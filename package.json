@@ -23,6 +23,8 @@
     "singleQuote": true
   },
   "test-tokenize": {
-    "skip": []
+    "skip": [
+      "array"
+    ]
   }
 }
