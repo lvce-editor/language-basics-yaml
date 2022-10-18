@@ -66,7 +66,7 @@ const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
-const RE_PROPERTY_NAME = /^.(.+?)(?=\s*:(\s+|$))/
+const RE_PROPERTY_NAME = /^[\p{L}\p{P}\p{S}.\d]+(?=\s*:(\s+|$))/u
 const RE_PROPERTY_NAME_2 =
   /^[\:@\/\\a-zA-Z\-\_\d\.\s]*[@\/\\a-zA-Z\-\_\d\.](?=\s*:(\s+|$))/
 const RE_PROPERTY_VALUE_1 = /^[^&].*(?=\s+#)/s
