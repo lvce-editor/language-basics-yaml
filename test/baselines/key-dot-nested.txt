@@ -1,0 +1,10 @@
+YamlPropertyName
+Punctuation
+NewLine
+Whitespace
+YamlPropertyName
+Punctuation
+NewLine
+Whitespace
+YamlPropertyName
+Punctuation
