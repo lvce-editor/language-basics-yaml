@@ -1,3 +1,4 @@
+YamlPropertyName
 Punctuation
 Whitespace
 YamlPropertyValueString

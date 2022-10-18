@@ -66,7 +66,7 @@ const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
 const RE_CURLY_CLOSE = /^\}/
-const RE_PROPERTY_NAME = /^[\:@\/\\a-zA-Z\-\_\d\.]+(?=\s*:(\s+|$))/
+const RE_PROPERTY_NAME = /^.(.+?)(?=\s*:(\s+|$))/
 const RE_PROPERTY_NAME_2 =
   /^[\:@\/\\a-zA-Z\-\_\d\.\s]*[@\/\\a-zA-Z\-\_\d\.](?=\s*:(\s+|$))/
 const RE_PROPERTY_VALUE_1 = /^[^&].*(?=\s+#)/s
@@ -153,6 +153,12 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_DASH))) {
           token = TokenType.Punctuation
           state = State.AfterDash
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringSingleQuoted
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringDoubleQuoted
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
           token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
@@ -165,12 +171,6 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_WORDS))) {
           token = TokenType.Text
           state = State.TopLevelContent
-        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
-          token = TokenType.Punctuation
-          state = State.InsidePropertyNameStringSingleQuoted
-        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
-          token = TokenType.Punctuation
-          state = State.InsidePropertyNameStringDoubleQuoted
         } else if ((next = part.match(RE_MERGE_KEY))) {
           token = TokenType.Punctuation
           state = State.AfterPropertyNameAfterColon
@@ -178,7 +178,6 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Text
           state = State.TopLevelContent
         } else {
-          part //?
           throw new Error('no')
         }
         break
@@ -283,6 +282,12 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_DASH))) {
           token = TokenType.Punctuation
           state = State.AfterDash
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringSingleQuoted
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsidePropertyNameStringDoubleQuoted
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
           token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
@@ -298,12 +303,6 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
-        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
-          token = TokenType.Punctuation
-          state = State.InsidePropertyNameStringSingleQuoted
-        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
-          token = TokenType.Punctuation
-          state = State.InsidePropertyNameStringDoubleQuoted
         } else {
           part
           throw new Error('no')
