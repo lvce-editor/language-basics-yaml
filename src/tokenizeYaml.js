@@ -74,7 +74,7 @@ const RE_SEMICOLON = /^;/
 const RE_COMMA = /^,/
 const RE_ANYTHING = /^.+/s
 const RE_ANYTHING_BUT_COMMENT = /^[^#]+/
-const RE_NUMERIC = /^(([0-9]+\.?[0-9]*)|(\.[0-9]+))(?=\s|$)/
+const RE_NUMERIC = /^(([0-9]+\.?[0-9]*)|(\.[0-9]+))(?=\s*$|\s+#|\s*[\[\]\{\}])/
 const RE_ANYTHING_UNTIL_CLOSE_BRACE = /^[^\}]+/
 const RE_BLOCK_COMMENT_START = /^\/\*/
 const RE_BLOCK_COMMENT_END = /^\*\//
