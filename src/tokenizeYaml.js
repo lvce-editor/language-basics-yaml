@@ -109,6 +109,7 @@ export const initialLineState = {
   tokens: [],
   indent: '',
   keyOffset: 0,
+  stack: [],
 }
 
 export const hasArrayReturn = true
@@ -137,6 +138,7 @@ export const tokenizeLine = (line, lineState) => {
   let token = TokenType.None
   let state = lineState.state
   let keyOffset = lineState.keyOffset
+  const stack = lineState.stack
   while (index < line.length) {
     const part = line.slice(index)
     switch (state) {
@@ -184,7 +186,7 @@ export const tokenizeLine = (line, lineState) => {
       case State.InsideLineComment:
         if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Comment
-          state = State.TopLevelContent
+          state = stack.pop() || State.TopLevelContent
         } else {
           throw new Error('no')
         }
@@ -248,6 +250,7 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
+          stack.push(State.AfterPipe)
         } else {
           throw new Error('no')
         }
@@ -390,5 +393,6 @@ export const tokenizeLine = (line, lineState) => {
     state,
     tokens,
     keyOffset,
+    stack,
   }
 }
