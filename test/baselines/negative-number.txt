@@ -1,0 +1,4 @@
+YamlPropertyName
+Punctuation
+Whitespace
+Numeric
