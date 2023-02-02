@@ -31,4 +31,7 @@ Whitespace
 YamlPropertyValueString
 NewLine
 Whitespace
+YamlPropertyName
+Punctuation
+Whitespace
 YamlPropertyValueString
