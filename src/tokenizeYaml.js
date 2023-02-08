@@ -252,6 +252,12 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Comment
           state = State.InsideLineComment
           stack.push(State.AfterPipe)
+        } else if ((next = part.match(RE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.AfterPipe
+        } else if ((next = part.match(RE_ANYTHING))) {
+          token = TokenType.Text
+          state = State.AfterPipe
         } else {
           throw new Error('no')
         }
