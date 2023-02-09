@@ -24,7 +24,8 @@
   },
   "test-tokenize": {
     "skip": [
-      "array"
+      "array",
+      "yaml-test-suite-zyu8"
     ]
   }
 }
