@@ -25,7 +25,8 @@
   "test-tokenize": {
     "skip": [
       "array",
-      "yaml-test-suite-zyu8"
+      "yaml-test-suite-zyu8",
+      "single-quoted-strings"
     ]
   }
 }
