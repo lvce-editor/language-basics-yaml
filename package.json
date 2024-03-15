@@ -12,11 +12,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@lvce-editor/package-extension": "^0.0.5",
-    "@lvce-editor/server": "^0.15.13",
-    "@lvce-editor/test-syntax-highlighting": "^0.0.16",
-    "prettier": "^2.8.8",
-    "typescript": "^5.0.4"
+    "@lvce-editor/package-extension": "^0.1.0",
+    "@lvce-editor/server": "^0.24.3",
+    "@lvce-editor/test-syntax-highlighting": "^1.0.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.2"
   },
   "prettier": {
     "semi": false,
