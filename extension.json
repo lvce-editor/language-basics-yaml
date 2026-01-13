@@ -5,9 +5,18 @@
   "languages": [
     {
       "id": "yaml",
-      "extensions": [".yml", ".eyaml", ".eyml", ".yaml", ".cff"],
-      "fileNames": [".travis.yml.off"],
+      "extensions": [
+        ".yml",
+        ".eyaml",
+        ".eyml",
+        ".yaml",
+        ".cff"
+      ],
+      "fileNames": [
+        ".travis.yml.off"
+      ],
       "tokenize": "src/tokenizeYaml.js"
     }
-  ]
+  ],
+  "repository": "https://github.com/lvce-editor/language-basics-yaml"
 }
