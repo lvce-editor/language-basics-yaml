@@ -2,6 +2,9 @@
  * @enum number
  */
 export const State = {
+  InsideFlowCollection: 13,
+  InsideFlowSingleQuotedString: 14,
+  InsideFlowDoubleQuotedString: 15,
   TopLevelContent: 1,
   InsideLineComment: 2,
   AfterPropertyName: 3,
@@ -62,6 +65,14 @@ export const TokenMap = {
   [TokenType.Anchor]: 'VariableName',
 }
 
+const RE_FLOW_OPEN = /^[\[{]/
+const RE_FLOW_CLOSE = /^[\]}]/
+const RE_FLOW_PROPERTY_NAME = /^[^\s[\]{},:'"]+(?=:[\s[\]{},]|:$)/
+const RE_FLOW_CONSTANT = /^(?:true|false|null)(?=[\s,\]}]|$)/
+const RE_FLOW_NUMERIC = /^-?(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?=[\s,\]}]|$)/
+const RE_FLOW_PLAIN = /^[^\s[\]{},]+(?:[ \t]+[^\s[\]{},#]+)*/
+const RE_FLOW_SINGLE_CONTENT = /^(?:''|[^'])+/
+const RE_FLOW_DOUBLE_CONTENT = /^(?:\\.|[^"\\])+/
 const RE_LINE_COMMENT_START = /^#/
 const RE_WHITESPACE = /^ +/
 const RE_CURLY_OPEN = /^\{/
@@ -139,12 +150,16 @@ export const tokenizeLine = (line, lineState) => {
   let token = TokenType.None
   let state = lineState.state
   let keyOffset = lineState.keyOffset
-  const stack = lineState.stack
+  const stack = [...lineState.stack]
   while (index < line.length) {
     const part = line.slice(index)
     switch (state) {
       case State.TopLevelContent:
-        if ((next = part.match(RE_LINE_COMMENT_START))) {
+        if ((next = part.match(RE_FLOW_OPEN))) {
+          token = TokenType.Punctuation
+          stack.push(State.TopLevelContent)
+          state = State.InsideFlowCollection
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
           token = TokenType.Comment
           state = State.InsideLineComment
         } else if ((next = part.match(RE_WHITESPACE))) {
@@ -184,6 +199,62 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.InsideFlowCollection:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+        } else if ((next = part.match(RE_FLOW_OPEN))) {
+          token = TokenType.Punctuation
+          stack.push(State.InsideFlowCollection)
+        } else if ((next = part.match(RE_FLOW_CLOSE))) {
+          token = TokenType.Punctuation
+          state = stack.pop() || State.TopLevelContent
+        } else if (
+          (next = part.match(RE_COMMA)) ||
+          (next = part.match(RE_COLON))
+        ) {
+          token = TokenType.Punctuation
+        } else if ((next = part.match(RE_LINE_COMMENT_START))) {
+          token = TokenType.Comment
+          stack.push(State.InsideFlowCollection)
+          state = State.InsideLineComment
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideFlowSingleQuotedString
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideFlowDoubleQuotedString
+        } else if ((next = part.match(RE_FLOW_PROPERTY_NAME))) {
+          token = TokenType.YamlPropertyName
+        } else if ((next = part.match(RE_FLOW_CONSTANT))) {
+          token = TokenType.LanguageConstant
+        } else if ((next = part.match(RE_FLOW_NUMERIC))) {
+          token = TokenType.Numeric
+        } else if ((next = part.match(RE_FLOW_PLAIN))) {
+          token = TokenType.YamlPropertyValueString
+        } else {
+          next = [part[0]]
+          token = TokenType.Text
+        }
+        break
+      case State.InsideFlowSingleQuotedString:
+        if ((next = part.match(RE_FLOW_SINGLE_CONTENT))) {
+          token = TokenType.String
+        } else if ((next = part.match(RE_SINGLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideFlowCollection
+        }
+        break
+      case State.InsideFlowDoubleQuotedString:
+        if ((next = part.match(RE_FLOW_DOUBLE_CONTENT))) {
+          token = TokenType.String
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideFlowCollection
+        } else {
+          next = [part[0]]
+          token = TokenType.String
+        }
+        break
       case State.InsideLineComment:
         if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Comment
@@ -204,7 +275,11 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.AfterPropertyNameAfterColon:
-        if ((next = part.match(RE_WHITESPACE))) {
+        if ((next = part.match(RE_FLOW_OPEN))) {
+          token = TokenType.Punctuation
+          stack.push(State.TopLevelContent)
+          state = State.InsideFlowCollection
+        } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterPropertyNameAfterColon
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
@@ -263,7 +338,11 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.AfterDash:
-        if ((next = part.match(RE_WHITESPACE))) {
+        if ((next = part.match(RE_FLOW_OPEN))) {
+          token = TokenType.Punctuation
+          stack.push(State.TopLevelContent)
+          state = State.InsideFlowCollection
+        } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterDash
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
@@ -289,7 +368,11 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.AfterPropertyNameAfterColonAfterNewLine:
-        if ((next = part.match(RE_WHITESPACE))) {
+        if ((next = part.match(RE_FLOW_OPEN))) {
+          token = TokenType.Punctuation
+          stack.push(State.TopLevelContent)
+          state = State.InsideFlowCollection
+        } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterPropertyNameAfterColonAfterNewLine
         } else if ((next = part.match(RE_DASH))) {
@@ -384,6 +467,9 @@ export const tokenizeLine = (line, lineState) => {
     tokens.push(token, tokenLength)
   }
   switch (state) {
+    case State.InsideLineComment:
+      state = stack.pop() || State.TopLevelContent
+      break
     case State.AfterPropertyNameAfterColon:
       state = State.AfterPropertyNameAfterColonAfterNewLine
       break

@@ -1,0 +1,9 @@
+values: [1, -2.5, true, false, null, trueish, plain value, foo#bar]
+nested: [[one, two], {name: "a,b]#c", enabled: true}]
+quoted: ['it''s [ok]', "escaped \"quote\"", 'multi
+  line']
+comments: [one, # comment
+  #
+  two]
+- [three, four]
+after: 42

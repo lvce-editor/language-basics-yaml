@@ -1,5 +1,12 @@
 YamlPropertyName
 Punctuation
 Whitespace
-YamlPropertyValueString
+Punctuation
+YamlPropertyName
+Punctuation
+Whitespace
+Punctuation
+String
+Punctuation
+Punctuation
 NewLine
