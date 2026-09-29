@@ -1,0 +1,16 @@
+--- # start with a comment
+---   # another start
+---# this is plain text, not a marker
+----
+- sequence item
+quoted: "---"
+block: |
+  ---
+---
+key: value
+empty:
+---
+afterEmpty: value
+-
+---
+afterSequence: value

@@ -105,6 +105,7 @@ const RE_COMBINATOR = /^[\+\>\~]/
 const RE_LANGUAGE_CONSTANT = /^(?:true|false|null)(?!#)/
 const RE_COLON = /^:/
 const RE_DASH = /^\-/
+const RE_DOCUMENT_START = /^---(?=$|[ \t]+(?:#|$))/
 const RE_WORDS = /^[\w\s\-\.]*\w/
 const RE_MULTI_LINE_STRING_START = /^(?:\||>\-|>)/
 const RE_KEY_PRE = /^\s*(\-\s*)?/
@@ -164,6 +165,9 @@ export const tokenizeLine = (line, lineState) => {
           state = State.InsideLineComment
         } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
+          state = State.TopLevelContent
+        } else if (index === 0 && (next = part.match(RE_DOCUMENT_START))) {
+          token = TokenType.Comment
           state = State.TopLevelContent
         } else if ((next = part.match(RE_LANGUAGE_CONSTANT))) {
           token = TokenType.LanguageConstant
@@ -338,7 +342,10 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.AfterDash:
-        if ((next = part.match(RE_FLOW_OPEN))) {
+        if (index === 0 && (next = part.match(RE_DOCUMENT_START))) {
+          token = TokenType.Comment
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_FLOW_OPEN))) {
           token = TokenType.Punctuation
           stack.push(State.TopLevelContent)
           state = State.InsideFlowCollection
@@ -368,7 +375,10 @@ export const tokenizeLine = (line, lineState) => {
         }
         break
       case State.AfterPropertyNameAfterColonAfterNewLine:
-        if ((next = part.match(RE_FLOW_OPEN))) {
+        if (index === 0 && (next = part.match(RE_DOCUMENT_START))) {
+          token = TokenType.Comment
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_FLOW_OPEN))) {
           token = TokenType.Punctuation
           stack.push(State.TopLevelContent)
           state = State.InsideFlowCollection
@@ -434,6 +444,9 @@ export const tokenizeLine = (line, lineState) => {
           } else {
             state = State.TopLevelContent
           }
+        } else if (index === 0 && (next = part.match(RE_DOCUMENT_START))) {
+          token = TokenType.Comment
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_PROPERTY_NAME))) {
           token = TokenType.YamlPropertyName
           state = State.AfterPropertyName
