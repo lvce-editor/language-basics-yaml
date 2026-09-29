@@ -1,0 +1,13 @@
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-db-admin-user
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-db-grafana-user

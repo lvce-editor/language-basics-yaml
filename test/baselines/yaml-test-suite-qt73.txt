@@ -1,5 +1,4 @@
-Punctuation
-YamlPropertyValueString
+Comment
 NewLine
 Punctuation
 Whitespace
