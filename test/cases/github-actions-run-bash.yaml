@@ -1,0 +1,9 @@
+jobs:
+  publish-release:
+    steps:
+      - name: Publish GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.create-release.outputs.rg_version }}"
+          gh release edit $VERSION --draft=false

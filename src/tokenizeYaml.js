@@ -117,7 +117,8 @@ const RE_ALIAS = /^\*.+/
 const RE_ANCHOR = /^\&.+/
 const RE_MERGE_KEY = /^<<\:(?=\s)/
 const RE_BASH_SHELL = /^(\s*)(?:-\s+)?shell\s*:\s*bash(?:\s+#.*)?$/
-const RE_RUN_BLOCK = /^(\s*)(?:-\s+)?run\s*:\s*\|/
+const RE_RUN_BLOCK =
+  /^(\s*)(?:-\s+)?run\s*:\s*\|(?:[-+][1-9]?|[1-9][-+]?)?(?:\s+#.*)?$/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -174,7 +175,7 @@ export const tokenizeLine = (line, lineState) => {
   if (shellMatch) {
     bashShellIndent = getKeyIndent(shellMatch)
   }
-  if (runMatch && getKeyIndent(runMatch) === bashShellIndent) {
+  if (runMatch) {
     embeddedLanguage = 'shellscript'
     embeddedIndent = -1
   } else if (lineState.embeddedLanguage === 'shellscript') {
