@@ -11,7 +11,7 @@ const tokenize = (lines) => {
   })
 }
 
-test('embeds explicitly selected Bash run blocks and resumes YAML after dedent', () => {
+test('embeds Bash run blocks and resumes YAML after dedent', () => {
   const lines = [
     'jobs:',
     '  release:',
@@ -39,17 +39,28 @@ test('embeds explicitly selected Bash run blocks and resumes YAML after dedent',
   assert.equal(results[10].embeddedLanguage, '')
 })
 
-test('does not embed unrelated scalars or run blocks without an explicit Bash shell', () => {
+test('embeds a default-shell run block without an explicit shell setting', () => {
   const lines = [
-    'description: |',
-    '  this is ordinary YAML text',
-    'steps:',
-    '  - shell: python',
-    '    run: |',
-    '      print("hello")',
-    '  - run: |',
-    '      echo hello',
+    'jobs:',
+    '  publish-release:',
+    '    steps:',
+    '      - name: Publish GitHub release',
+    '        env:',
+    '          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}',
+    '        run: |',
+    '          VERSION="${{ needs.create-release.outputs.rg_version }}"',
+    '          gh release edit $VERSION --draft=false',
   ]
+
+  const results = tokenize(lines)
+
+  assert.equal(results[6].embeddedLanguage, 'shellscript')
+  assert.equal(results[7].embeddedLanguage, 'shellscript')
+  assert.equal(results[8].embeddedLanguage, 'shellscript')
+})
+
+test('does not embed unrelated YAML literal scalars', () => {
+  const lines = ['description: |', '  this is ordinary YAML text', 'steps:']
 
   const results = tokenize(lines)
 
