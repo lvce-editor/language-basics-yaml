@@ -6,7 +6,7 @@
     {
       "id": "yaml",
       "extensions": [".yml", ".eyaml", ".eyml", ".yaml", ".cff"],
-      "fileNames": [".travis.yml.off"],
+      "fileNames": [".travis.yml.off", "actions.lock"],
       "tokenize": "src/tokenizeYaml.js",
       "configuration": "./languageConfiguration.json"
     }
