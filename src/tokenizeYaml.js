@@ -116,9 +116,10 @@ const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"]+/
 const RE_ALIAS = /^\*.+/
 const RE_ANCHOR = /^\&.+/
 const RE_MERGE_KEY = /^<<\:(?=\s)/
-const RE_BASH_SHELL = /^(\s*)(?:-\s+)?shell\s*:\s*bash(?:\s+#.*)?$/
+const RE_SHELL = /^(\s*)(?:-\s+)?shell\s*:\s*([a-zA-Z0-9_-]+)(?:\s+#.*)?$/
 const RE_RUN_BLOCK =
   /^(\s*)(?:-\s+)?run\s*:\s*\|(?:[-+][1-9]?|[1-9][-+]?)?(?:\s+#.*)?$/
+const RE_RUN_INLINE = /^(\s*)(?:-\s+)?run\s*:[ \t]*(.+)$/
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -127,7 +128,9 @@ export const initialLineState = {
   keyOffset: 0,
   stack: [],
   bashShellIndent: -1,
+  shellLanguage: '',
   embeddedLanguage: '',
+  embeddedInline: false,
   embeddedIndent: -1,
 }
 
@@ -158,27 +161,54 @@ export const tokenizeLine = (line, lineState) => {
   let state = lineState.state
   let keyOffset = lineState.keyOffset
   let bashShellIndent = lineState.bashShellIndent ?? -1
+  let shellLanguage = lineState.shellLanguage || ''
   let embeddedLanguage = ''
+  let embeddedInline = false
   let embeddedIndent = lineState.embeddedIndent ?? -1
   const stack = [...lineState.stack]
   const indentation = line.match(RE_WHITESPACE)?.[0].length || 0
-  const shellMatch = line.match(RE_BASH_SHELL)
+  const shellMatch = line.match(RE_SHELL)
   const runMatch = line.match(RE_RUN_BLOCK)
+  const inlineRunMatch = line.match(RE_RUN_INLINE)
+  let inlineRunStart = 0
+  let inlineRunEnd = line.length
   const getKeyIndent = (match) =>
     match[1].length + (match[0].trimStart().startsWith('- ') ? 2 : 0)
   if (line.trimStart().startsWith('- ') && !shellMatch) {
     bashShellIndent = -1
+    shellLanguage = ''
   }
   if (bashShellIndent >= 0 && indentation < bashShellIndent) {
     bashShellIndent = -1
   }
   if (shellMatch) {
     bashShellIndent = getKeyIndent(shellMatch)
+    shellLanguage = shellMatch[2].toLowerCase()
   }
   if (runMatch) {
     embeddedLanguage = 'shellscript'
     embeddedIndent = -1
-  } else if (lineState.embeddedLanguage === 'shellscript') {
+  } else if (
+    inlineRunMatch &&
+    !/^[|>]/.test(inlineRunMatch[2]) &&
+    !inlineRunMatch[2].trimStart().startsWith('#') &&
+    (!shellLanguage || shellLanguage === 'bash')
+  ) {
+    const command = inlineRunMatch[2]
+    inlineRunStart = inlineRunMatch[0].length - command.length
+    if (command.startsWith('"') || command.startsWith("'")) {
+      inlineRunStart++
+      if (command.length > 1 && command.endsWith(command[0])) {
+        inlineRunEnd--
+      }
+    }
+    embeddedLanguage = 'shellscript'
+    embeddedInline = true
+    embeddedIndent = -1
+  } else if (
+    lineState.embeddedLanguage === 'shellscript' &&
+    !lineState.embeddedInline
+  ) {
     if (
       line.length === 0 ||
       indentation >= (embeddedIndent < 0 ? keyOffset + 1 : embeddedIndent)
@@ -540,13 +570,21 @@ export const tokenizeLine = (line, lineState) => {
     keyOffset,
     stack,
     bashShellIndent,
+    shellLanguage,
     embeddedLanguage,
+    embeddedInline,
     embeddedLanguageStart: embeddedLanguage
-      ? runMatch || line.trim().length === 0
-        ? line.length
-        : indentation
+      ? inlineRunMatch && !runMatch
+        ? inlineRunStart
+        : runMatch || line.trim().length === 0
+          ? line.length
+          : indentation
       : 0,
-    embeddedLanguageEnd: embeddedLanguage ? line.length : 0,
+    embeddedLanguageEnd: embeddedLanguage
+      ? inlineRunMatch && !runMatch
+        ? inlineRunEnd
+        : line.length
+      : 0,
     embeddedIndent,
   }
 }
